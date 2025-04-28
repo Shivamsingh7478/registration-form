@@ -13,7 +13,9 @@ export const Navbar = () => {
             >
                 <span className="navbar-toggler-icon"></span>
                
-            </button>  
+            </button>
+
+         <div> 
           <ul className="navbar-links">
             <li>Home</li>
             <li>about us</li>
@@ -27,6 +29,8 @@ export const Navbar = () => {
             <li>sign up</li>
             <li>log in</li>
           </ul>
+        
+        </div> 
         </div> 
         </nav>
     );
