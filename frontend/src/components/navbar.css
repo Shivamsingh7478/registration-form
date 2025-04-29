@@ -1,22 +1,16 @@
-/* Navbar.css */
-
-/* Custom color for the navbar background */
 .custom-navbar {
     background-color: #0074c2;
 }
 
-/* Text color */
 .custom-navbar .nav-link, 
 .custom-navbar .navbar-brand {
     color: #fffefe;
 }
 
-/* Hover effect for links */
 .custom-navbar .nav-link:hover {
     color: #d1ecff;
 }
 
-/* Toggler icon color */
 .navbar-toggler {
     background-color: #fffefe;
 }

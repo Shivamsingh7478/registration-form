@@ -1,3 +1,5 @@
+import './navbar.css'
+
 export const Navbar = () => {
     return (
         <nav className="navbar navbar-expand-lg custom-navbar">
@@ -15,21 +17,35 @@ export const Navbar = () => {
                
             </button>
 
-         <div> 
-          <ul className="navbar-links">
-            <li>Home</li>
-            <li>about us</li>
-            <li>help</li>
+         <div className="collapse navbar-collapse" id="navbarNav"> 
+          <div className="d-flex w-100 justify-content-between align-items-center">
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            <li className="nav-item">
+              <a className="nav-link" href="#">Home</a>
+
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" href="#">About us</a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="#">Help</a>
+            </li>
           </ul>
 
-          <div>Registration Form</div>
+          <div className="text-center text-white fw-bold" style={{flex:1}}>Registration Form</div>
 
 
-          <ul className="navbar-links">
-            <li>sign up</li>
-            <li>log in</li>
+          <ul className="navbar-nav">
+          <li className="nav-item">
+                <a className="nav-link" href="#">Sign up</a>
+            </li>
+            <li className="nav-item">
+                <a className="nav-link" href="#">Log in</a>
+            </li>
           </ul>
         
+        
+        </div>
         </div> 
         </div> 
         </nav>
