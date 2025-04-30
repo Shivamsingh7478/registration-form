@@ -32,7 +32,9 @@ export const Navbar = () => {
             </li>
           </ul>
 
-          <div className="text-center text-white fw-bold" style={{flex:1}}>Registration Form</div>
+          <div className="text-center text-white fw-bold" style={{flex:1}}>
+            <h2>Registration Form</h2>
+          </div>
 
 
           <ul className="navbar-nav">
