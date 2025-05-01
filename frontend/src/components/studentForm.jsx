@@ -66,7 +66,6 @@ export const RegistrationForm = () => {
     e.preventDefault();
     if (validate()) {
       alert("Form submitted successfully!");
-      // Submit logic here
     }
   };
 
@@ -336,11 +335,27 @@ export const RegistrationForm = () => {
               </div>
 
   
-            <button type="submit" className="btn" style={{ backgroundColor: '#0074c2', color: '#fffefe' }}>
+            {/* <button type="submit" className="btn" style={{ backgroundColor: '#0074c2', color: '#fffefe' }}>
               Submit
-            </button>
+            </button> */}
           </form>
         </div>
+
+
+        <button
+        type="submit"
+        className="btn btn-primary btn-lg w-100 mt-3"
+        style={{
+          backgroundColor: '#0074c2',
+          color: '#fffefe',
+          padding: '15px',
+          fontSize: '1.2rem',
+          height: '60px',
+          borderRadius: '8px'
+        }}
+      >
+        Submit
+      </button>
       </div>
 
 
