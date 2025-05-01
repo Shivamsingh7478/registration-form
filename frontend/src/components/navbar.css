@@ -9,6 +9,7 @@
 
 .custom-navbar .nav-link:hover {
     color: #d1ecff;
+    text-decoration: underline;
 }
 
 .navbar-toggler {

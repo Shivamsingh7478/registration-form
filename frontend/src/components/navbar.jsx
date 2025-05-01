@@ -2,7 +2,7 @@ import './navbar.css'
 
 export const Navbar = () => {
     return (
-        <nav className="navbar navbar-expand-lg custom-navbar">
+        <nav className="navbar navbar-expand-lg custom-navbar" style={{backgroundColor: '#0074c2'}}>
          <div className="container-fluid">
             <button
             className="navbar-toggler"
