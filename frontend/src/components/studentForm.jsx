@@ -1,30 +1,51 @@
 import { useState, useRef } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 
 
 export const RegistrationForm = () => {
+  
+  const [captchaValue, setCaptchaValue] = useState(null);
+  const captchaRef = useRef();
   const formRef = useRef();
   const [formData, setFormData] = useState({
-    fullName: "", fatherName: "", dob: "", idProof: "", bloodGroup: "",
-    street: "", city: "", state: "", pincode: "",
-    email: "", phone: "",
-    institute: "", course: "", branch: "",
-    experienceType: "", organization: "", role: "", experienceDuration: "",
+    name: '',
+    email: '',
+    phone: '',
+    experiences: [
+      {
+        experienceType: '',
+        organization: '',
+        role: '',
+        experienceDuration: '',
+      },
+    ],
   });
 
   const [errors, setErrors] = useState({});
 
-  const handleChange = (e) => {
+  const handleChange = (e, index = null) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-
-    // Clear error for that field on change
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: null }));
+  
+    if (index !== null) {
+      const updatedExperiences = [...formData.experiences];
+      updatedExperiences[index][name] = value;
+      setFormData({ ...formData, experiences: updatedExperiences });
+    } else {
+      setFormData({ ...formData, [name]: value });
+  
+      if (errors[name]) {
+        setErrors((prev) => ({ ...prev, [name]: null }));
+      }
     }
   };
 
-  const renderError = (field) =>
-    errors[field] && <div className="text-danger small">{errors[field]}</div>;
+  const renderError = (field, index = null) => {
+    if (index !== null) {
+      const key = `experience_${index}_${field}`;
+      return errors[key] && <div className="text-danger small">{errors[key]}</div>;
+    }
+    return errors[field] && <div className="text-danger small">{errors[field]}</div>;
+  };
 
   const validate = () => {
     let tempErrors = {};
@@ -62,14 +83,52 @@ export const RegistrationForm = () => {
       }
     }
 
+
+    formData.experiences.forEach((exp, index) => {
+      ['experienceType', 'organization', 'role', 'experienceDuration'].forEach((key) => {
+        if (!exp[key]) {
+          tempErrors[`experience_${index}_${key}`] = 'This field is required';
+        }
+      });
+    });
+
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
+  };
+
+  const handleCaptchaChange = (value) => {
+    setCaptchaValue(value);
+    console.log("Captcha value:", value);  // You can see the token here
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
       alert("Form submitted successfully!");
+    }
+
+    if (!captchaValue) {
+      setErrors((prev) => ({ ...prev, captcha: 'Please verify the captcha' }));
+      return;
+    }
+
+    try {
+      // Submit data to the backend
+      // const response = await axios.post('/your-backend-endpoint', formData);
+  
+      // If successful
+      alert('Form submitted successfully!');
+  
+      // ✅ Reset form fields and captcha
+      setFormData({ fullname: '', email: '', password: '' });
+      setErrors({});
+      captchaRef.current.reset();       // <- reset the reCAPTCHA widget
+      setCaptchaValue(null);           // <- reset the captcha state
+  
+    } catch (err) {
+      // Handle server errors
+      console.error(err);
+      setErrors({ general: "Submission failed. Try again." });
     }
   };
 
@@ -78,7 +137,20 @@ export const RegistrationForm = () => {
     formRef.current.requestSubmit();  // This triggers the form's onSubmit
   };
 
-
+  const addExperience = () => {
+    setFormData(prevState => ({
+      ...prevState,
+      experiences: [
+        ...prevState.experiences,
+        {
+          experienceType: '',
+          organization: '',
+          role: '',
+          experienceDuration: ''
+        }
+      ]
+    }));
+  };
 
     return (
       <div className="container my-5">
@@ -156,7 +228,7 @@ export const RegistrationForm = () => {
                 name="bloodGroup"
                 value={formData.bloodGroup}
                 onChange={handleChange}>
-                  <option value="" disabled>Select a Blood Group</option>
+                  <option value="" disabled selected>Select a Blood Group</option>
                   <option value="O+">O+</option>
                   <option value="O-">O-</option>
                   <option value="A+">A+</option>
@@ -217,7 +289,7 @@ export const RegistrationForm = () => {
                   value={formData.state}
                   onChange={handleChange}
                 >
-                  <option value="" disabled>Select a State</option>
+                  <option value="" disabled selected>Select a State</option>
                   <option value="CSE">CSE</option>
                   <option value="CSSE">CSSE</option>
                   <option value="IT">IT</option>
@@ -284,7 +356,7 @@ export const RegistrationForm = () => {
                 <select className="form-select" id="course" name="course"
                 value={formData.course}
                 onChange={handleChange}>
-                  <option value="" disabled>Select a course</option>
+                  <option value="" disabled selected>Select a course</option>
                   <option value="btech">B.Tech</option>
                   <option value="bca">BCA</option>
                   <option value="mba">MBA</option>
@@ -296,8 +368,8 @@ export const RegistrationForm = () => {
                 <label htmlFor="branch" className="form-label">Branch</label>
                 <select className="form-select" id="branch" name="branch"
                 value={formData.branch}
-                onChange={handleChange}>
-                  <option value="" disabled>Select a Branch</option>
+                onChange={(e) => handleChange(e, index)}>
+                  <option value="" disabled selected>Select a Branch</option>
                   <option value="btech">CSE</option>
                   <option value="bca">CSSE</option>
                   <option value="mba">IT</option>
@@ -310,7 +382,7 @@ export const RegistrationForm = () => {
 
 
             <h5 className="mb-3" style={{ color: '#0074c2' }}>Work Experience</h5>
-            <div className="row mb-3">
+            {/* <div className="row mb-3">
               <div className="col-md-6">
                 <label htmlFor="name" className="form-label">Type of Experience</label>
                 <select className="form-select" id="experienceType" name="experienceType"
@@ -368,16 +440,71 @@ export const RegistrationForm = () => {
                 />
                 {renderError("experienceDuration")}
               </div>
-            </div>
+            </div> */}
 
 
 
-            <div className="row mb-3">
+            {formData.experiences.map((exp, index) => (
+            <div  key={index}
+            style={{
+              borderTop: index !== 0 ? "2px solid #ccc" : "none",
+              paddingTop: index !== 0 ? "20px" : "0px",
+              marginTop: index !== 0 ? "20px" : "0px"
+            }}>
+              <div className="row mb-3">
+              <div className="col-md-6">
+              <label htmlFor="name" className="form-label">Type of Experience</label>
+                  
+                <select className="form-select" id="experienceType" name="experienceType"
+                          value={exp.experienceType}
+                          onChange={(e) => handleChange(e, index)}
+                          placeholder="Internship, Full-time etc.">
+                            <option value="" disabled>Select</option>
+                            <option value="btech">Internship</option>
+                            <option value="bca">Part-time Job</option>
+                            <option value="mba">Academic Project</option>
+                          </select>
+                          {renderError("experienceType")}
+
+              
+              </div>
+              </div>
+              
+              <div className="row mb-3">
+              <div className="col-md-6">
+                <label className="form-label">Organization</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="organization"
+                  value={exp.organization}
+                  onChange={(e) => handleChange(e, index)}
+                  placeholder="Company name"
+                />
+                {renderError("organization")}
+              </div>
+              
+              <div className="col-md-6">
+                <label className="form-label">Role</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="role"
+                  value={exp.role}
+                  onChange={(e) => handleChange(e, index)}
+                  placeholder="Your role"
+                />
+                {renderError("role")}
+              </div>
+              </div>
+
+              <div className="row mb-3">
               <div className="col-md-6">
                 <label htmlFor="name" className="form-label">Duration of Experience</label>
                 <select className="form-select" id="experienceDuration" name="experienceDuration"
-                value={formData.experienceDuration}
-                onChange={handleChange}>
+                value={exp.experienceDuration}
+                onChange={(e) => handleChange(e, index)}
+                placeholder="e.g. 6 months">
                   <option value="" disabled>in Months</option>
                   <option value="btech">less than month</option>
                   <option value="bca">1</option>
@@ -388,10 +515,24 @@ export const RegistrationForm = () => {
                   <option value="mba">6</option>
                   <option value="bca">7</option>
                   <option value="mba">8</option>
+
+
                 </select>
                 {renderError("experienceDuration")}
               </div>
               </div>
+            </div>
+          ))}
+
+          <div className="mb-4 ">
+            <button
+              type="button"
+              className="btn btn-outline-primary"
+              onClick={addExperience}
+            >
+              + Add Work Experience
+            </button>
+          </div>
 
   
             {/* <button type="submit" className="btn" style={{ backgroundColor: '#0074c2', color: '#fffefe' }}>
@@ -399,6 +540,17 @@ export const RegistrationForm = () => {
             </button> */}
           </form>
         </div>
+
+
+        
+
+
+        <ReCAPTCHA
+  sitekey="6LeFLS8rAAAAAJ-w7XadNVSyr7Y7h4NLIJjNR8tb"
+  onChange={handleCaptchaChange}
+  ref={captchaRef}
+/>
+{errors.captcha && <div className="text-danger small">{errors.captcha}</div>}
 
 
         <button
