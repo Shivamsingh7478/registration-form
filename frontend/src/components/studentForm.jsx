@@ -17,6 +17,7 @@ export const RegistrationForm = () => {
         organization: '',
         role: '',
         experienceDuration: '',
+        year: '',
       },
     ],
   });
@@ -29,6 +30,15 @@ export const RegistrationForm = () => {
     if (index !== null) {
       const updatedExperiences = [...formData.experiences];
       updatedExperiences[index][name] = value;
+
+      if (name === 'year') {
+        updatedExperiences.sort((a, b) => {
+          const yearA = parseInt(a.year) || 0;
+          const yearB = parseInt(b.year) || 0;
+          return yearB - yearA;
+        });
+      }
+
       setFormData({ ...formData, experiences: updatedExperiences });
     } else {
       setFormData({ ...formData, [name]: value });
@@ -85,7 +95,7 @@ export const RegistrationForm = () => {
 
 
     formData.experiences.forEach((exp, index) => {
-      ['experienceType', 'organization', 'role', 'experienceDuration'].forEach((key) => {
+      ['experienceType', 'organization', 'role', 'experienceDuration', 'year'].forEach((key) => {
         if (!exp[key]) {
           tempErrors[`experience_${index}_${key}`] = 'This field is required';
         }
@@ -138,19 +148,24 @@ export const RegistrationForm = () => {
   };
 
   const addExperience = () => {
-    setFormData(prevState => ({
-      ...prevState,
-      experiences: [
-        ...prevState.experiences,
-        {
-          experienceType: '',
-          organization: '',
-          role: '',
-          experienceDuration: ''
-        }
-      ]
-    }));
+    const newExperience = {
+      experienceType: '',
+      organization: '',
+      role: '',
+      experienceDuration: '',
+      year: ''
+    };
+    const updatedExperiences = [...formData.experiences, newExperience];
+    setFormData({ ...formData, experiences: updatedExperiences });
   };
+
+
+
+  const currentYear = new Date().getFullYear();
+const yearOptions = [];
+for (let i = 0; i < 10; i++) {
+  yearOptions.push(currentYear - i);
+}
 
     return (
       <div className="container my-5">
@@ -519,7 +534,26 @@ export const RegistrationForm = () => {
 
                 </select>
                 {renderError("experienceDuration")}
-              </div>
+                </div>
+
+                <div className="col-md-6">
+                    <label htmlFor="name" className="form-label">Year</label>
+                    <select
+                      className="form-select"
+                      id="year"
+                      name="year"
+                      value={exp.year}
+                      onChange={(e) => handleChange(e, index)}
+                    >
+                      <option value="" disabled selected>Select Year</option>
+                      {yearOptions.map((year) => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                    {renderError("year", index)}
+                 </div>
+
+              
               </div>
             </div>
           ))}
